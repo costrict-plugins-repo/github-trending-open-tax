@@ -1,0 +1,103 @@
+{
+  "tax_year": 2025,
+  "source": "IRS Rev. Proc. 2024-40, One Big Beautiful Bill Act (OBBBA) 2025",
+  "standard_deduction": {
+    "single": 15750,
+    "married_filing_jointly": 31500,
+    "married_filing_separately": 15750,
+    "head_of_household": 23625,
+    "additional_65_or_older": {
+      "single": 2000,
+      "married": 1600
+    },
+    "additional_blind": {
+      "single": 2000,
+      "married": 1600
+    }
+  },
+  "schedule_1a_above_the_line": {
+    "note": "New OBBBA deductions available even when taking the standard deduction",
+    "qualified_tips_exclusion": {
+      "max_amount": 25000,
+      "description": "Exclusion for tips received by employees in traditionally tipped occupations",
+      "magi_phase_out_start": 160000,
+      "applies_to": "Cash and charged tips reported on W-2"
+    },
+    "qualified_overtime_pay": {
+      "max_amount": 12500,
+      "description": "Deduction for overtime premium pay (the 1.5x portion above regular rate)",
+      "magi_phase_out_start": 160000,
+      "applies_to": "Overtime wages reported on W-2"
+    },
+    "auto_loan_interest": {
+      "max_amount": null,
+      "description": "Deduction for interest on auto loans for vehicles purchased after enactment",
+      "requirements": "Vehicle must be assembled in the United States",
+      "max_vehicle_price": 100000
+    },
+    "senior_bonus_deduction": {
+      "amount": 4000,
+      "description": "Additional deduction for taxpayers age 65 and older who do not itemize",
+      "applies_to": "Taxpayers 65+ taking the standard deduction"
+    }
+  },
+  "salt_deduction": {
+    "cap": 40000,
+    "cap_married_filing_separately": 20000,
+    "phase_out": {
+      "start_agi": 400000,
+      "rate": "10% reduction per $20,000 over threshold",
+      "floor": 10000
+    },
+    "includes": ["State income tax", "Local income tax", "Property tax", "Sales tax (if elected)"]
+  },
+  "itemized_deductions": {
+    "mortgage_interest": {
+      "acquisition_debt_limit": 750000,
+      "acquisition_debt_limit_pre_2017": 1000000,
+      "home_equity_debt_limit": 0,
+      "note": "Home equity interest NOT deductible unless used to buy/build/improve home"
+    },
+    "charitable_contributions": {
+      "cash_limit_percent_agi": 0.60,
+      "appreciated_property_limit_percent_agi": 0.30,
+      "must_itemize": true,
+      "substantiation_over_250": "Written acknowledgment required"
+    },
+    "medical_expenses": {
+      "agi_floor_percent": 0.075,
+      "description": "Deductible only to extent exceeding 7.5% of AGI"
+    },
+    "casualty_losses": {
+      "requirement": "Federally declared disaster area only",
+      "floor_per_event": 100,
+      "agi_floor_percent": 0.10
+    }
+  },
+  "above_the_line_deductions": {
+    "educator_expenses": 300,
+    "hsa_contributions": {
+      "self_only": 4300,
+      "family": 8550,
+      "catch_up_55_plus": 1000
+    },
+    "ira_deduction": {
+      "max_contribution": 7000,
+      "catch_up_50_plus": 1000,
+      "phase_out_with_employer_plan": {
+        "single": { "start": 79000, "end": 89000 },
+        "married_filing_jointly": { "start": 126000, "end": 146000 }
+      }
+    },
+    "student_loan_interest": {
+      "max_deduction": 2500,
+      "magi_phase_out": {
+        "single": { "start": 80000, "end": 95000 },
+        "married_filing_jointly": { "start": 165000, "end": 195000 }
+      }
+    },
+    "self_employment_tax_deduction": "50% of SE tax",
+    "self_employed_health_insurance": "100% of premiums",
+    "alimony": "Deductible only for agreements before 2019"
+  }
+}

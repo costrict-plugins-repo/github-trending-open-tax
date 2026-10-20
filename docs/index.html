@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Tax — Free, Open-Source Tax Preparation for Claude Code</title>
+  <meta name="description" content="Open Tax is a free, open-source tax preparation plugin for Claude Code. Parse W-2s, 1099s, crypto transactions, compute taxes, and export to TurboTax or FreeTaxUSA.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #FAF9F6;
+      --bg-secondary: #F3F1EC;
+      --bg-card: #FFFFFF;
+      --text-primary: #1A1A1A;
+      --text-secondary: #4A4A4A;
+      --text-muted: #7A7A7A;
+      --accent: #D4714E;
+      --accent-light: #E8956F;
+      --accent-dark: #B85A3A;
+      --accent-bg: #FDF0EB;
+      --border: #E5E2DC;
+      --border-light: #EDEBE6;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- NAV ---- */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(250,249,246,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-light);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled {
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-logo span {
+      color: var(--accent);
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      background: var(--text-primary);
+      color: var(--bg-primary) !important;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--accent-dark) !important; color: #fff !important; }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-primary);
+      margin: 5px 0;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    /* ---- SECTIONS ---- */
+    section {
+      padding: 96px 24px;
+    }
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+      padding: 160px 24px 96px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(212,113,78,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--text-primary);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent-dark); }
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-visual {
+      margin-top: 64px;
+      padding: 24px;
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      border: 1px solid var(--border-light);
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .terminal {
+      background: #1E1E1E;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+    .terminal-bar {
+      padding: 10px 16px;
+      background: #2D2D2D;
+      display: flex;
+      gap: 8px;
+    }
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .terminal-dot:nth-child(1) { background: #FF5F57; }
+    .terminal-dot:nth-child(2) { background: #FEBC2E; }
+    .terminal-dot:nth-child(3) { background: #28C840; }
+    .terminal-body {
+      padding: 20px;
+      color: #D4D4D4;
+    }
+    .terminal-body .prompt { color: #6A9955; }
+    .terminal-body .cmd { color: #DCDCAA; }
+    .terminal-body .output { color: #9CDCFE; }
+    .terminal-body .accent { color: #CE9178; }
+
+    /* ---- HOW IT WORKS ---- */
+    .how-it-works { background: var(--bg-secondary); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 48px;
+    }
+    .step {
+      text-align: center;
+      padding: 40px 24px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .step:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .step-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: var(--accent-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 20px;
+    }
+    .step-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .step h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+    .step p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+    }
+    .step-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--border);
+      font-size: 1.5rem;
+    }
+
+    /* ---- FEATURES ---- */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .feature-card {
+      padding: 28px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+    .feature-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--accent-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* ---- INSTALL ---- */
+    .install { background: var(--bg-secondary); }
+    .install-methods {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .install-card {
+      padding: 32px 24px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+    }
+    .install-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .install-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .code-block {
+      background: #1E1E1E;
+      color: #D4D4D4;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      overflow-x: auto;
+      position: relative;
+    }
+    .code-block .comment { color: #6A9955; }
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #aaa;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-family: var(--font);
+      transition: 0.2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+    /* ---- SKILLS ---- */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .skill-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 24px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+      transition: box-shadow 0.3s;
+    }
+    .skill-item:hover { box-shadow: var(--shadow-sm); }
+    .skill-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .skill-item h4 {
+      font-size: 0.95rem;
+      font-family: var(--font-mono);
+      color: var(--accent-dark);
+      margin-bottom: 4px;
+    }
+    .skill-item p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    /* ---- PRIVACY ---- */
+    .privacy { background: var(--bg-secondary); }
+    .privacy-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 48px;
+      align-items: center;
+    }
+    .privacy-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .privacy-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 0.95rem;
+    }
+    .privacy-check {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #E6F4E6;
+      color: #2D8B2D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+      font-size: 0.85rem;
+    }
+    .privacy-visual {
+      padding: 40px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+      text-align: center;
+    }
+    .privacy-visual .shield {
+      font-size: 4rem;
+      margin-bottom: 16px;
+    }
+    .privacy-visual h3 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+    .privacy-visual p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* ---- ROADMAP ---- */
+    .roadmap-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .roadmap-item {
+      padding: 20px 24px;
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .roadmap-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .tag-planned { background: #FFF3E0; color: #E65100; }
+    .tag-next { background: #E3F2FD; color: #1565C0; }
+    .tag-future { background: #F3E5F5; color: #7B1FA2; }
+
+    /* ---- CTA ---- */
+    .cta-section {
+      background: var(--text-primary);
+      color: #fff;
+      text-align: center;
+    }
+    .cta-section .section-label { color: var(--accent-light); }
+    .cta-section .section-title { color: #fff; }
+    .cta-section .section-subtitle { color: rgba(255,255,255,0.7); margin: 0 auto 32px; }
+    .cta-section .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .cta-section .btn-primary:hover { background: var(--accent-light); }
+
+    /* ---- FOOTER ---- */
+    footer {
+      padding: 48px 24px;
+      border-top: 1px solid var(--border-light);
+      text-align: center;
+    }
+    .footer-content {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-disclaimer {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-light);
+    }
+    .footer-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ---- ANIMATIONS ---- */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 900px) {
+      .steps, .install-methods { grid-template-columns: 1fr; }
+      .privacy-content { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: rgba(250,249,246,0.98);
+        backdrop-filter: blur(12px);
+        padding: 24px;
+        gap: 16px;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .nav-toggle { display: block; }
+      section { padding: 64px 20px; }
+      .hero { padding: 120px 20px 64px; }
+      .hero h1 { font-size: 2.2rem; }
+      .roadmap-items { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span>Open</span>Tax
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="https://github.com/tugberkgoc/open-tax" target="_blank" rel="noopener" class="nav-cta">GitHub</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero-badge">Open Source &middot; MIT License</div>
+      <h1>Tax prep,<br><span>powered by AI</span></h1>
+      <p>Open Tax is a free, open-source tax preparation plugin for Claude Code. Parse your documents, compute your taxes, and export to TurboTax or FreeTaxUSA.</p>
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/tugberkgoc/open-tax" target="_blank" rel="noopener" class="btn btn-secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="hero-visual fade-in">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+          </div>
+          <div class="terminal-body">
+            <div><span class="prompt">$</span> <span class="cmd">claude</span></div>
+            <div><span class="output">&gt;</span> <span class="accent">/open-tax</span></div>
+            <div>&nbsp;</div>
+            <div><span class="output">Welcome to Open Tax! Let's prepare your 2025 federal return.</span></div>
+            <div><span class="output">Drop your W-2s, 1099s, and crypto CSVs into workspace/raw/</span></div>
+            <div><span class="output">and I'll take it from there.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">Three steps to your tax return</h2>
+      <p class="section-subtitle">Drop your documents in, let Open Tax do the heavy lifting, then export to your favorite filing platform.</p>
+      <div class="steps">
+        <div class="step fade-in">
+          <div class="step-icon">📄</div>
+          <div class="step-num">Step 1</div>
+          <h3>Ingest Documents</h3>
+          <p>Drop your W-2s, 1099-INT, 1099-DIV, 1099-B, crypto CSVs, and other tax documents into the workspace.</p>
+        </div>
+        <div class="step fade-in">
+          <div class="step-icon">🧮</div>
+          <div class="step-num">Step 2</div>
+          <h3>Compute Taxes</h3>
+          <p>Open Tax calculates your income, deductions, credits, and tax liability using current federal tax tables.</p>
+        </div>
+        <div class="step fade-in">
+          <div class="step-icon">📤</div>
+          <div class="step-num">Step 3</div>
+          <h3>Export &amp; File</h3>
+          <p>Generate output ready for TurboTax, FreeTaxUSA, or manual entry. Review and file with confidence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything you need to prepare your taxes</h2>
+      <p class="section-subtitle">Built for real-world tax scenarios, from simple W-2 filings to complex crypto portfolios.</p>
+      <div class="features-grid">
+        <div class="feature-card fade-in">
+          <div class="feature-icon">📑</div>
+          <h3>Document Parsing</h3>
+          <p>Automatically parse W-2s, 1099-INT, 1099-DIV, 1099-B, 1099-NEC, 1099-MISC, and more into structured data.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">💰</div>
+          <h3>Federal Tax Computation</h3>
+          <p>Accurate calculation of income, standard/itemized deductions, tax brackets, credits, and total liability.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">₿</div>
+          <h3>Crypto Support</h3>
+          <p>FIFO cost basis calculation for cryptocurrency transactions. Import from major exchanges via CSV.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">🚪</div>
+          <h3>Backdoor Roth Detection</h3>
+          <p>Identifies and correctly handles backdoor Roth IRA conversions, including pro-rata rule calculations.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">🔍</div>
+          <h3>Deduction Finder</h3>
+          <p>Suggests commonly missed deductions based on your financial profile. Standard vs. itemized comparison.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">✅</div>
+          <h3>Sanity Checks &amp; Review</h3>
+          <p>Cross-references your return against common errors, missing forms, and IRS red flags before you file.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">🔄</div>
+          <h3>Excess SS Tax Recovery</h3>
+          <p>Detects excess Social Security tax withholding from multiple employers and claims refunds automatically.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">🧠</div>
+          <h3>Self-Improving</h3>
+          <p>Learns from corrections and edge cases across sessions. Gets smarter with every tax return it helps prepare.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section class="install" id="install">
+    <div class="container">
+      <div class="section-label">Get started</div>
+      <h2 class="section-title">Install in seconds</h2>
+      <p class="section-subtitle">Three ways to get Open Tax up and running.</p>
+      <div class="install-methods">
+        <div class="install-card fade-in">
+          <h3>⚡ Claude Code Plugin</h3>
+          <p>The fastest way. Install directly as a Claude Code plugin.</p>
+          <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="comment"># Install the plugin</span><br>
+            claude plugin add open-tax
+          </div>
+        </div>
+        <div class="install-card fade-in">
+          <h3>📦 Clone from GitHub</h3>
+          <p>Clone the repo and use it as a local project.</p>
+          <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            git clone https://github.com/<br>tugberkgoc/open-tax.git<br>
+            cd open-tax
+          </div>
+        </div>
+        <div class="install-card fade-in">
+          <h3>🤖 Any AI Tool</h3>
+          <p>Works with any AI assistant that can read project files.</p>
+          <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="comment"># Point your AI tool at the</span><br>
+            <span class="comment"># open-tax directory and run</span><br>
+            /open-tax
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="skills-section" id="skills">
+    <div class="container">
+      <div class="section-label">Under the hood</div>
+      <h2 class="section-title">Modular skill architecture</h2>
+      <p class="section-subtitle">Open Tax is built from composable skills, each handling a specific part of the tax preparation pipeline.</p>
+      <div class="skills-grid">
+        <div class="skill-item fade-in">
+          <div class="skill-dot"></div>
+          <div>
+            <h4>tax-wizard</h4>
+            <p>The main orchestrator. Guides you through the entire tax preparation process step by step.</p>
+          </div>
+        </div>
+        <div class="skill-item fade-in">
+          <div class="skill-dot"></div>
+          <div>
+            <h4>data-ingest</h4>
+            <p>Parses raw tax documents into a canonical JSON schema for downstream processing.</p>
+          </div>
+        </div>
+        <div class="skill-item fade-in">
+          <div class="skill-dot"></div>
+          <div>
+            <h4>calculator</h4>
+            <p>Computes income, deductions, credits, and tax liability using current federal tax tables.</p>
+          </div>
+        </div>
+        <div class="skill-item fade-in">
+          <div class="skill-dot"></div>
+          <div>
+            <h4>crypto</h4>
+            <p>Handles cryptocurrency gain/loss calculations with FIFO cost basis tracking.</p>
+          </div>
+        </div>
+        <div class="skill-item fade-in">
+          <div class="skill-dot"></div>
+          <div>
+            <h4>output</h4>
+            <p>Generates formatted output for TurboTax and FreeTaxUSA import or manual entry.</p>
+          </div>
+        </div>
+        <div class="skill-item fade-in">
+          <div class="skill-dot"></div>
+          <div>
+            <h4>reviewer</h4>
+            <p>Runs sanity checks, cross-references forms, and flags potential issues before filing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="privacy" id="privacy">
+    <div class="container">
+      <div class="section-label">Privacy first</div>
+      <h2 class="section-title">Your data never leaves your machine</h2>
+      <p class="section-subtitle">Open Tax processes everything locally. No servers, no uploads, no tracking.</p>
+      <div class="privacy-content">
+        <ul class="privacy-points fade-in">
+          <li>
+            <div class="privacy-check">&#10003;</div>
+            <div><strong>100% local processing</strong><br><span style="color:var(--text-secondary); font-size:0.9rem;">All tax calculations run on your machine. Nothing is sent anywhere.</span></div>
+          </li>
+          <li>
+            <div class="privacy-check">&#10003;</div>
+            <div><strong>Zero external dependencies</strong><br><span style="color:var(--text-secondary); font-size:0.9rem;">Pure Python stdlib. No pip packages, no node modules, no hidden network calls.</span></div>
+          </li>
+          <li>
+            <div class="privacy-check">&#10003;</div>
+            <div><strong>Git-ignored by default</strong><br><span style="color:var(--text-secondary); font-size:0.9rem;">Your workspace/ directory with tax documents is excluded from version control.</span></div>
+          </li>
+          <li>
+            <div class="privacy-check">&#10003;</div>
+            <div><strong>Open source &amp; auditable</strong><br><span style="color:var(--text-secondary); font-size:0.9rem;">Every line of code is on GitHub. Verify for yourself that nothing leaves your machine.</span></div>
+          </li>
+        </ul>
+        <div class="privacy-visual fade-in">
+          <div class="shield">🛡️</div>
+          <h3>Your tax data stays with you</h3>
+          <p>No cloud. No API calls. No telemetry. Just you and your tax return, on your own hardware.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section class="roadmap" id="roadmap">
+    <div class="container">
+      <div class="section-label">What's next</div>
+      <h2 class="section-title">Roadmap</h2>
+      <p class="section-subtitle">Open Tax is growing. Here's where we're headed.</p>
+      <div class="roadmap-items">
+        <div class="roadmap-item fade-in">
+          <span class="roadmap-tag tag-next">Next</span>
+          Multi-state tax support
+        </div>
+        <div class="roadmap-item fade-in">
+          <span class="roadmap-tag tag-next">Next</span>
+          Year-round tax planning
+        </div>
+        <div class="roadmap-item fade-in">
+          <span class="roadmap-tag tag-planned">Planned</span>
+          Life event guidance
+        </div>
+        <div class="roadmap-item fade-in">
+          <span class="roadmap-tag tag-planned">Planned</span>
+          Business tax support
+        </div>
+        <div class="roadmap-item fade-in">
+          <span class="roadmap-tag tag-future">Future</span>
+          Full consultancy mode
+        </div>
+        <div class="roadmap-item fade-in">
+          <span class="roadmap-tag tag-future">Future</span>
+          Tax document OCR
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="section-label">Ready?</div>
+      <h2 class="section-title">Start preparing your taxes for free</h2>
+      <p class="section-subtitle">Open source, zero cost, and entirely under your control.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/tugberkgoc/open-tax" target="_blank" rel="noopener" class="btn btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Get Open Tax on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-links">
+          <a href="https://github.com/tugberkgoc/open-tax" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/tugberkgoc/open-tax/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+          <a href="https://github.com/tugberkgoc/open-tax/issues" target="_blank" rel="noopener">Report an Issue</a>
+          <a href="#features">Features</a>
+          <a href="#install">Install</a>
+        </div>
+        <p class="footer-meta">Open Tax &middot; Open source tax preparation for Claude Code</p>
+        <p class="footer-disclaimer">
+          <strong>Disclaimer:</strong> Open Tax is a tax preparation aid only and does not constitute professional tax, legal, or accounting advice. It is not a substitute for a qualified CPA, EA, or tax attorney. You are solely responsible for reviewing and verifying all calculations before filing. US federal taxes only. See the full <a href="https://github.com/tugberkgoc/open-tax/blob/main/DISCLAIMER.md" target="_blank" rel="noopener" style="color:var(--accent);">disclaimer</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Mobile nav toggle
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    // Close mobile nav on link click
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('open');
+      });
+    });
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Copy code blocks
+    function copyCode(btn) {
+      const block = btn.parentElement;
+      const text = block.textContent.replace('Copy', '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>

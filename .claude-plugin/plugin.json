@@ -1,0 +1,12 @@
+{
+  "name": "open-tax",
+  "description": "Free, open-source US federal tax preparation assistant. Parses W-2s, 1099s, crypto transactions, computes taxes, and exports to TurboTax/FreeTaxUSA.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Tugberk Goc",
+    "url": "https://github.com/tugberkgoc"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/tugberkgoc/open-tax",
+  "repository": "https://github.com/tugberkgoc/open-tax"
+}

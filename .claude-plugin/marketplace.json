@@ -1,0 +1,24 @@
+{
+  "name": "open-tax-marketplace",
+  "owner": {
+    "name": "Tugberk Goc",
+    "email": "tugberkgoc@gmail.com"
+  },
+  "metadata": {
+    "description": "Open Tax plugin marketplace — free, open-source tax preparation for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "open-tax",
+      "source": {
+        "source": "github",
+        "repo": "tugberkgoc/open-tax"
+      },
+      "description": "Free, open-source US federal tax preparation assistant. Parses W-2s, 1099s, crypto transactions, computes taxes, and exports to TurboTax/FreeTaxUSA.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Tugberk Goc"
+      }
+    }
+  ]
+}

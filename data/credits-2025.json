@@ -1,0 +1,96 @@
+{
+  "tax_year": 2025,
+  "source": "IRS Rev. Proc. 2024-40, One Big Beautiful Bill Act (OBBBA) 2025",
+  "child_tax_credit": {
+    "max_per_child": 2500,
+    "refundable_portion": 1700,
+    "age_limit": 17,
+    "phase_out": {
+      "single": 200000,
+      "married_filing_jointly": 400000,
+      "reduction_per_1000": 50
+    },
+    "ssn_required": true
+  },
+  "other_dependent_credit": {
+    "max_per_dependent": 500,
+    "description": "For dependents who don't qualify for CTC (age 17+, non-child dependents)",
+    "nonrefundable": true
+  },
+  "earned_income_credit": {
+    "no_children": {
+      "max_credit": 649,
+      "phase_out_start": { "single": 10620, "married_filing_jointly": 17550 },
+      "phase_out_end": { "single": 18591, "married_filing_jointly": 25511 },
+      "age_requirement": "25-64 (or any age if former foster youth/homeless youth)"
+    },
+    "one_child": {
+      "max_credit": 4328,
+      "phase_out_start": { "single": 21560, "married_filing_jointly": 28490 },
+      "phase_out_end": { "single": 49084, "married_filing_jointly": 56004 }
+    },
+    "two_children": {
+      "max_credit": 7152,
+      "phase_out_start": { "single": 21560, "married_filing_jointly": 28490 },
+      "phase_out_end": { "single": 55768, "married_filing_jointly": 62688 }
+    },
+    "three_plus_children": {
+      "max_credit": 8046,
+      "phase_out_start": { "single": 21560, "married_filing_jointly": 28490 },
+      "phase_out_end": { "single": 59899, "married_filing_jointly": 66819 }
+    },
+    "investment_income_limit": 11600,
+    "disqualifying_income_types": ["Foreign earned income exclusion"]
+  },
+  "education_credits": {
+    "american_opportunity": {
+      "max_credit": 2500,
+      "calculation": "100% of first $2,000 + 25% of next $2,000",
+      "refundable_portion": 0.40,
+      "max_years": 4,
+      "magi_phase_out": {
+        "single": { "start": 80000, "end": 90000 },
+        "married_filing_jointly": { "start": 160000, "end": 180000 }
+      }
+    },
+    "lifetime_learning": {
+      "max_credit": 2000,
+      "calculation": "20% of first $10,000 in qualified expenses",
+      "refundable": false,
+      "magi_phase_out": {
+        "single": { "start": 80000, "end": 90000 },
+        "married_filing_jointly": { "start": 160000, "end": 180000 }
+      }
+    }
+  },
+  "retirement_savings_credit": {
+    "max_contribution_basis": 2000,
+    "rates": {
+      "single": [
+        { "max_agi": 23750, "rate": 0.50 },
+        { "max_agi": 25750, "rate": 0.20 },
+        { "max_agi": 39500, "rate": 0.10 }
+      ],
+      "married_filing_jointly": [
+        { "max_agi": 47500, "rate": 0.50 },
+        { "max_agi": 51500, "rate": 0.20 },
+        { "max_agi": 79000, "rate": 0.10 }
+      ],
+      "head_of_household": [
+        { "max_agi": 35625, "rate": 0.50 },
+        { "max_agi": 38625, "rate": 0.20 },
+        { "max_agi": 59250, "rate": 0.10 }
+      ]
+    }
+  },
+  "premium_tax_credit": {
+    "description": "Health insurance marketplace premium subsidy",
+    "fpl_range": "100%-400% of federal poverty level",
+    "note": "Enhanced PTC from ARP/IRA extended; check current status"
+  },
+  "estimated_tax_payments": {
+    "description": "Not a credit per se, but reduces tax owed dollar-for-dollar",
+    "quarterly_due_dates_2025": ["2025-04-15", "2025-06-16", "2025-09-15", "2026-01-15"],
+    "safe_harbor": "Pay 100% of prior year tax or 90% of current year tax (110% if AGI > $150k)"
+  }
+}

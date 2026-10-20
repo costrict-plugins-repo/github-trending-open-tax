@@ -1,0 +1,123 @@
+{
+  "format_version": "V042",
+  "description": "TXF (Tax Exchange Format) reference codes for importing into TurboTax Desktop",
+  "header": {
+    "version_line": "V042",
+    "software_line": "AOpen Tax",
+    "date_format": "MM/DD/YYYY"
+  },
+  "income_codes": {
+    "wages_salaries_tips": { "code": 1, "form": "1040", "line": "1" },
+    "taxable_interest": { "code": 2, "form": "1040", "line": "2b" },
+    "ordinary_dividends": { "code": 3, "form": "1040", "line": "3b" },
+    "qualified_dividends": { "code": 32, "form": "1040", "line": "3a" },
+    "taxable_refunds": { "code": 4, "form": "1040", "line": "1z" },
+    "alimony_received": { "code": 5, "form": "1040", "line": "2a" },
+    "business_income": { "code": 6, "form": "Schedule C", "line": "31" },
+    "capital_gain_loss": { "code": 7, "form": "1040", "line": "7" },
+    "other_gains": { "code": 8, "form": "1040", "line": "8" },
+    "ira_distributions": { "code": 9, "form": "1040", "line": "4b" },
+    "pensions_annuities": { "code": 10, "form": "1040", "line": "5b" },
+    "rental_royalty": { "code": 11, "form": "Schedule E", "line": "26" },
+    "farm_income": { "code": 12, "form": "Schedule F", "line": "34" },
+    "unemployment": { "code": 13, "form": "1040", "line": "7" },
+    "social_security": { "code": 14, "form": "1040", "line": "6b" },
+    "other_income": { "code": 15, "form": "1040", "line": "8" }
+  },
+  "capital_gains_codes": {
+    "short_term_basis_reported": {
+      "code": 711,
+      "form": "8949",
+      "box": "A",
+      "description": "Short-term, basis reported to IRS (Box A)"
+    },
+    "short_term_basis_not_reported": {
+      "code": 712,
+      "form": "8949",
+      "box": "B",
+      "description": "Short-term, basis NOT reported to IRS (Box B)"
+    },
+    "short_term_no_1099b": {
+      "code": 713,
+      "form": "8949",
+      "box": "C",
+      "description": "Short-term, no Form 1099-B received (Box C)"
+    },
+    "long_term_basis_reported": {
+      "code": 714,
+      "form": "8949",
+      "box": "D",
+      "description": "Long-term, basis reported to IRS (Box D)"
+    },
+    "long_term_basis_not_reported": {
+      "code": 715,
+      "form": "8949",
+      "box": "E",
+      "description": "Long-term, basis NOT reported to IRS (Box E)"
+    },
+    "long_term_no_1099b": {
+      "code": 716,
+      "form": "8949",
+      "box": "F",
+      "description": "Long-term, no Form 1099-B received (Box F)"
+    },
+    "short_term_digital_asset_reported": {
+      "code": 717,
+      "form": "8949",
+      "box": "G",
+      "description": "Short-term digital assets, basis reported (Box G) — NEW 2025"
+    },
+    "short_term_digital_asset_not_reported": {
+      "code": 718,
+      "form": "8949",
+      "box": "H",
+      "description": "Short-term digital assets, basis NOT reported (Box H) — NEW 2025"
+    },
+    "short_term_digital_asset_no_1099": {
+      "code": 719,
+      "form": "8949",
+      "box": "I",
+      "description": "Short-term digital assets, no 1099 (Box I) — NEW 2025"
+    },
+    "long_term_digital_asset_reported": {
+      "code": 720,
+      "form": "8949",
+      "box": "J",
+      "description": "Long-term digital assets, basis reported (Box J) — NEW 2025"
+    },
+    "long_term_digital_asset_not_reported": {
+      "code": 721,
+      "form": "8949",
+      "box": "K",
+      "description": "Long-term digital assets, basis NOT reported (Box K) — NEW 2025"
+    },
+    "long_term_digital_asset_no_1099": {
+      "code": 722,
+      "form": "8949",
+      "box": "L",
+      "description": "Long-term digital assets, no 1099 (Box L) — NEW 2025"
+    }
+  },
+  "adjustment_codes": {
+    "W": "Wash sale loss disallowed",
+    "B": "Basis reported to IRS is incorrect",
+    "T": "Short-term transaction reported on long-term form",
+    "O": "Other (see attached statement)"
+  },
+  "txf_record_format": {
+    "description": "Each transaction is a multi-line record",
+    "fields": [
+      "TD (transaction detail marker)",
+      "N{code} (reference code)",
+      "C1 (copy 1 — taxpayer)",
+      "L1 (line 1 — description of property)",
+      "D{date_acquired} (date acquired MM/DD/YYYY)",
+      "D{date_sold} (date sold MM/DD/YYYY)",
+      "${proceeds} (sales price/proceeds)",
+      "${cost_basis} (cost or other basis)",
+      "L{adjustment_code} (optional adjustment code)",
+      "${adjustment_amount} (optional wash sale adjustment)",
+      "^"
+    ]
+  }
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Open Tax</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FAF9F6;
+            color: #2D2D2D;
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .updated {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+        }
+        h2 {
+            font-size: 1.3rem;
+            margin-top: 36px;
+            margin-bottom: 12px;
+            color: #D4714E;
+        }
+        p, li {
+            margin-bottom: 12px;
+            color: #444;
+        }
+        ul {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+        a {
+            color: #D4714E;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 10px 20px;
+            background: #2D2D2D;
+            color: #FAF9F6;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .back:hover {
+            background: #444;
+            text-decoration: none;
+        }
+        .highlight {
+            background: #f0ebe4;
+            border-left: 3px solid #D4714E;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: April 3, 2026</p>
+
+        <div class="highlight">
+            <strong>The short version:</strong> Open Tax runs entirely on your local machine. We do not collect, store, transmit, or have access to any of your data. Period.
+        </div>
+
+        <h2>What Open Tax Is</h2>
+        <p>Open Tax is a free, open-source plugin for Claude Code that assists with US federal tax preparation. It is distributed as source code via GitHub and runs locally within your Claude Code environment.</p>
+
+        <h2>Data Collection</h2>
+        <p>Open Tax does <strong>not</strong> collect any data. Specifically:</p>
+        <ul>
+            <li>No personal information is collected, stored, or transmitted</li>
+            <li>No tax documents, financial data, or computed results leave your machine</li>
+            <li>No analytics, telemetry, or usage tracking of any kind</li>
+            <li>No cookies, local storage, or browser fingerprinting</li>
+            <li>No network requests are made by the plugin itself</li>
+            <li>No accounts are required to use Open Tax</li>
+        </ul>
+
+        <h2>Where Your Data Lives</h2>
+        <p>All tax documents, parsed data, computed results, and export files are stored locally in the <code>workspace/</code> directory on your machine. This directory is gitignored by default to prevent accidental commits of personal data.</p>
+
+        <h2>Third-Party Services</h2>
+        <p>Open Tax itself makes no calls to external services. However:</p>
+        <ul>
+            <li><strong>Claude Code / Claude API</strong> — When you use Open Tax through Claude Code, your prompts and conversations are processed by Anthropic's API according to <a href="https://www.anthropic.com/legal/privacy" target="_blank">Anthropic's Privacy Policy</a>. Open Tax does not control this.</li>
+            <li><strong>GitHub</strong> — The source code is hosted on GitHub. Downloading or cloning the repository is subject to <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank">GitHub's Privacy Statement</a>.</li>
+        </ul>
+
+        <h2>Open Source Transparency</h2>
+        <p>Open Tax is fully open source under the MIT License. You can inspect every line of code at <a href="https://github.com/tugberkgoc/open-tax" target="_blank">github.com/tugberkgoc/open-tax</a> to verify these privacy claims for yourself. The plugin contains no obfuscated code, no hidden network calls, and no data exfiltration of any kind.</p>
+
+        <h2>Children's Privacy</h2>
+        <p>Open Tax does not knowingly collect any information from anyone, including children under 13.</p>
+
+        <h2>Changes to This Policy</h2>
+        <p>If this privacy policy changes, updates will be posted on this page with a revised date. Since Open Tax collects no data, meaningful changes are unlikely.</p>
+
+        <h2>Contact</h2>
+        <p>For questions about this privacy policy, open an issue on <a href="https://github.com/tugberkgoc/open-tax/issues" target="_blank">GitHub</a>.</p>
+
+        <a href="/open-tax/" class="back">Back to Open Tax</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open Tax Canonical Data Schema",
+  "description": "The standard format for all parsed tax data. Produced by ingest scripts, consumed by calculator scripts.",
+  "type": "object",
+  "required": ["tax_year", "filing_status"],
+  "properties": {
+    "tax_year": {
+      "type": "integer",
+      "description": "Tax year being filed",
+      "example": 2025
+    },
+    "filing_status": {
+      "type": "string",
+      "enum": ["single", "married_filing_jointly", "married_filing_separately", "head_of_household", "qualifying_surviving_spouse"]
+    },
+    "taxpayer": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "ssn_last_four": { "type": "string", "pattern": "^\\d{4}$" },
+        "date_of_birth": { "type": "string", "format": "date" },
+        "is_blind": { "type": "boolean", "default": false }
+      }
+    },
+    "spouse": {
+      "type": "object",
+      "description": "Only for MFJ/MFS",
+      "properties": {
+        "name": { "type": "string" },
+        "ssn_last_four": { "type": "string", "pattern": "^\\d{4}$" },
+        "date_of_birth": { "type": "string", "format": "date" },
+        "is_blind": { "type": "boolean", "default": false }
+      }
+    },
+    "dependents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "relationship": { "type": "string" },
+          "date_of_birth": { "type": "string", "format": "date" },
+          "ssn_last_four": { "type": "string" },
+          "qualifies_for_ctc": { "type": "boolean" },
+          "months_lived_with_taxpayer": { "type": "integer", "minimum": 0, "maximum": 12 }
+        }
+      }
+    },
+    "w2_income": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["employer", "wages", "federal_withheld"],
+        "properties": {
+          "employer": { "type": "string" },
+          "employer_ein": { "type": "string" },
+          "wages": { "type": "number", "description": "Box 1" },
+          "federal_withheld": { "type": "number", "description": "Box 2" },
+          "ss_wages": { "type": "number", "description": "Box 3" },
+          "ss_tax_withheld": { "type": "number", "description": "Box 4" },
+          "medicare_wages": { "type": "number", "description": "Box 5" },
+          "medicare_tax_withheld": { "type": "number", "description": "Box 6" },
+          "tips": { "type": "number", "description": "Box 7 (SS tips) + Box 8 (allocated tips)" },
+          "state": { "type": "string" },
+          "state_wages": { "type": "number", "description": "Box 16" },
+          "state_tax_withheld": { "type": "number", "description": "Box 17" },
+          "retirement_contributions": { "type": "number", "description": "Box 12 codes D/E/G/AA/BB" },
+          "hsa_contributions": { "type": "number", "description": "Box 12 code W" }
+        }
+      }
+    },
+    "self_employment_income": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "gross_income"],
+        "properties": {
+          "description": { "type": "string" },
+          "payer": { "type": "string" },
+          "form_type": { "type": "string", "enum": ["1099-NEC", "1099-MISC", "other"] },
+          "gross_income": { "type": "number" },
+          "expenses": { "type": "number", "default": 0 },
+          "net_income": { "type": "number" }
+        }
+      }
+    },
+    "interest_income": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "payer": { "type": "string" },
+          "amount": { "type": "number", "description": "1099-INT Box 1" },
+          "us_savings_bond_interest": { "type": "number", "description": "Box 3" },
+          "federal_tax_withheld": { "type": "number", "description": "Box 4" },
+          "tax_exempt_interest": { "type": "number", "description": "Box 8" }
+        }
+      }
+    },
+    "dividend_income": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "payer": { "type": "string" },
+          "ordinary_dividends": { "type": "number", "description": "1099-DIV Box 1a" },
+          "qualified_dividends": { "type": "number", "description": "Box 1b" },
+          "capital_gain_distributions": { "type": "number", "description": "Box 2a" },
+          "federal_tax_withheld": { "type": "number", "description": "Box 4" },
+          "foreign_tax_paid": { "type": "number", "description": "Box 7" }
+        }
+      }
+    },
+    "capital_transactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "date_sold", "proceeds"],
+        "properties": {
+          "description": { "type": "string" },
+          "date_acquired": { "type": "string", "format": "date", "description": "YYYY-MM-DD or 'VARIOUS'" },
+          "date_sold": { "type": "string", "format": "date" },
+          "proceeds": { "type": "number" },
+          "cost_basis": { "type": "number" },
+          "gain_loss": { "type": "number" },
+          "holding_period": { "type": "string", "enum": ["short", "long"] },
+          "is_digital_asset": { "type": "boolean", "default": false },
+          "basis_reported_to_irs": { "type": "boolean" },
+          "wash_sale_loss_disallowed": { "type": "number", "default": 0 },
+          "adjustment_code": { "type": "string" },
+          "form_8949_box": { "type": "string", "enum": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] }
+        }
+      }
+    },
+    "crypto_income": {
+      "type": "array",
+      "description": "Non-sale crypto income (staking, airdrops, mining)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["staking", "airdrop", "mining", "lending", "other"] },
+          "asset": { "type": "string" },
+          "amount_received": { "type": "number" },
+          "fair_market_value_usd": { "type": "number" },
+          "date_received": { "type": "string", "format": "date" },
+          "source": { "type": "string" }
+        }
+      }
+    },
+    "deductions": {
+      "type": "object",
+      "properties": {
+        "method": { "type": "string", "enum": ["standard", "itemized"] },
+        "salt_paid": { "type": "number", "description": "State and local taxes paid" },
+        "mortgage_interest": { "type": "number" },
+        "charitable_cash": { "type": "number" },
+        "charitable_noncash": { "type": "number" },
+        "medical_expenses": { "type": "number" },
+        "student_loan_interest": { "type": "number" },
+        "educator_expenses": { "type": "number" },
+        "hsa_contributions": { "type": "number" },
+        "ira_contributions": { "type": "number" },
+        "schedule_1a": {
+          "type": "object",
+          "properties": {
+            "qualified_tips": { "type": "number" },
+            "overtime_pay": { "type": "number" },
+            "auto_loan_interest": { "type": "number" },
+            "senior_bonus": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "estimated_payments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "amount": { "type": "number" }
+        }
+      }
+    },
+    "other_income": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "description": { "type": "string" },
+          "amount": { "type": "number" }
+        }
+      }
+    }
+  }
+}
